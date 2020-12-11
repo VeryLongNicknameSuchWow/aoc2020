@@ -85,112 +85,28 @@ public class Day11 {
         return counter;
     }
 
-    //this function is terrible, i hate it, must rewrite
     public static int countVisibleOccupiedSeats(final int seatCol, final int seatRow) {
         int counter = 0;
-
-        for (int col = seatCol - 1; col >= 0; col--) {
-            if (isOutOfBounds(seatRow, col)) {
-                continue;
-            }
-            if (input[seatRow][col] == 'L') {
-                break;
-            } else if (input[seatRow][col] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        for (int col = seatCol + 1; col < input[0].length; col++) {
-            if (isOutOfBounds(seatRow, col)) {
-                continue;
-            }
-            if (input[seatRow][col] == 'L') {
-                break;
-            } else if (input[seatRow][col] == '#') {
-                counter++;
-                break;
+        for (int rowD = -1; rowD <= 1; rowD++) {
+            for (int colD = -1; colD <= 1; colD++) {
+                if (rowD == 0 && colD == 0) {
+                    continue;
+                }
+                for (int i = 1; true; i++) {
+                    final int row = seatRow + i * rowD;
+                    final int col = seatCol + i * colD;
+                    if (isOutOfBounds(row, col)) {
+                        break;
+                    }
+                    if (input[row][col] == 'L') {
+                        break;
+                    } else if (input[row][col] == '#') {
+                        counter++;
+                        break;
+                    }
+                }
             }
         }
-
-        for (int row = seatRow - 1; row >= 0; row--) {
-            if (isOutOfBounds(row, seatCol)) {
-                continue;
-            }
-            if (input[row][seatCol] == 'L') {
-                break;
-            } else if (input[row][seatCol] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        for (int row = seatRow + 1; row < input.length; row++) {
-            if (isOutOfBounds(row, seatCol)) {
-                continue;
-            }
-            if (input[row][seatCol] == 'L') {
-                break;
-            } else if (input[row][seatCol] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        int o1 = seatRow + seatCol;
-        for (int col = seatCol - 1; col >= 0; col--) {
-            int row = -col + o1;
-            if (isOutOfBounds(row, col)) {
-                continue;
-            }
-            if (input[row][col] == 'L') {
-                break;
-            } else if (input[row][col] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        for (int col = seatCol + 1; col < input[0].length; col++) {
-            int row = -col + o1;
-            if (isOutOfBounds(row, col)) {
-                continue;
-            }
-            if (input[row][col] == 'L') {
-                break;
-            } else if (input[row][col] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        int o2 = seatRow - seatCol;
-        for (int col = seatCol - 1; col >= 0; col--) {
-            int row = col + o2;
-            if (isOutOfBounds(row, col)) {
-                continue;
-            }
-            if (input[row][col] == 'L') {
-                break;
-            } else if (input[row][col] == '#') {
-                counter++;
-                break;
-            }
-        }
-
-        for (int col = seatCol + 1; col < input[0].length; col++) {
-            int row = col + o2;
-            if (isOutOfBounds(row, col)) {
-                continue;
-            }
-            if (input[row][col] == 'L') {
-                break;
-            } else if (input[row][col] == '#') {
-                counter++;
-                break;
-            }
-        }
-
         return counter;
     }
 
