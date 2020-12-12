@@ -14,8 +14,8 @@ public class Day12 {
     }
 
     public static int part1(final String[] instructions) {
-        //[0] is NS axis, S+, N+
-        //[1] is EW axis, E+, W+
+        //[0] is NS axis, S+, N-
+        //[1] is EW axis, E+, W-
         int[] loc = new int[2];
         //E=0, S=90, W=180, N=270 (degrees)
         int rotation = 0;
