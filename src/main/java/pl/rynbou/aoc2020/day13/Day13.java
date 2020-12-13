@@ -3,10 +3,12 @@ package pl.rynbou.aoc2020.day13;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 public class Day13 {
 
@@ -38,43 +40,47 @@ public class Day13 {
         return minWait * minBus;
     }
 
-    public static long part2(final Set<Integer> busSet, final List<String> schedule) {
+    public static long part2(final Set<Integer> buses, final List<String> schedule) {
         final Map<Integer, Integer> busOffsetMap = IntStream.range(0, schedule.size())
                 .filter(i -> !"x".equals(schedule.get(i)))
                 .boxed()
                 .collect(Collectors.toMap(i -> Integer.parseInt(schedule.get(i)), i -> i));
-        final List<Integer> sortedBuses = busSet.stream()
-                .sorted(Comparator.comparingInt(Integer::intValue).reversed())
-                .collect(Collectors.toList());
 
-        long commonMultiple = 1;
+        long previousCommonMultiple = 1;
         long startTime = 0;
         for (int i = 2; i < busOffsetMap.size(); i++) {
-            int[] buses = sortedBuses.stream().limit(i).mapToInt(a -> a).toArray();
-            commonMultiple = 1;
-            for (int bus : buses) {
+            final int[] subBuses = buses.stream().limit(i).mapToInt(a -> a).toArray();
+            long commonMultiple = 1;
+            for (final int bus : subBuses) {
                 commonMultiple *= bus;
             }
-            startTime = LongStream.range(startTime, commonMultiple)
-                    .filter(t -> Arrays.stream(buses).noneMatch(bus -> (t + busOffsetMap.get(bus)) % bus != 0))
-                    .findFirst()
-                    .orElse(0);
+            timeLoop:
+            for (long n = 1; true; n++) {
+                final long time = startTime + n * previousCommonMultiple;
+                for (final int bus : subBuses) {
+                    if (isInvalidForBus(time + busOffsetMap.get(bus), bus)) {
+                        continue timeLoop;
+                    }
+                }
+                startTime = time;
+                break;
+            }
+            previousCommonMultiple = commonMultiple;
         }
 
-        long time = startTime;
-        do {
-            time += commonMultiple;
-        } while (!isValidTimestamp(time, busOffsetMap));
-
-        return time;
+        timeLoop:
+        for (int n = 1; true; n++) {
+            final long time = startTime + n * previousCommonMultiple;
+            for (final int bus : buses) {
+                if (isInvalidForBus(time + busOffsetMap.get(bus), bus)) {
+                    continue timeLoop;
+                }
+            }
+            return time;
+        }
     }
 
-    public static boolean isValidTimestamp(final long time, final Map<Integer, Integer> busOffsetMap) {
-        return busOffsetMap.entrySet().stream()
-                .allMatch(entry -> isValidForBus(time + entry.getValue(), entry.getKey()));
-    }
-
-    public static boolean isValidForBus(final long time, final int bus) {
-        return time % bus == 0;
+    public static boolean isInvalidForBus(final long time, final int bus) {
+        return time % bus != 0;
     }
 }
