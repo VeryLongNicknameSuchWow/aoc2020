@@ -17,5 +17,7 @@ public class Day15 {
         final MemoryGame game = new MemoryGame(input);
         game.start(2020);
         System.out.println(game.getLastNumber());
+        game.start(30000000);
+        System.out.println(game.getLastNumber());
     }
 }

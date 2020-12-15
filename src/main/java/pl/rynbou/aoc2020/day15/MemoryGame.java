@@ -1,43 +1,45 @@
 package pl.rynbou.aoc2020.day15;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Map;
 
 public class MemoryGame {
 
-    private final List<Integer> numberHistory = new ArrayList<>();
+    private final Map<Integer, Integer> numberLastTurnMap = new HashMap<>();
+    private final Map<Integer, Integer> numberAgeMap = new HashMap<>();
+    private int lastNumber;
+    private int turn = 1;
 
     public MemoryGame(final List<Integer> startingNums) {
-        numberHistory.addAll(startingNums);
+        for (int num : startingNums) {
+            sayNumber(num);
+            turn++;
+        }
     }
 
-    public void start(int finalTurn) {
-        for (int turn = numberHistory.size() + 1; turn <= finalTurn; turn++) {
-            final int lastNum = getLastNumber();
-            final int count = countOccurrences(lastNum);
-            if (count == 1) {
-                numberHistory.add(0);
+    public void start(final int finalTurn) {
+        for (; turn <= finalTurn; turn++) {
+            final boolean usedOnce = !numberAgeMap.containsKey(lastNumber);
+            if (usedOnce) {
+                sayNumber(0);
             } else {
-                numberHistory.add(getAge(lastNum));
+                sayNumber(numberAgeMap.get(lastNumber));
             }
         }
     }
 
-    public int getAge(final int number) {
-        int[] indexes = IntStream.range(0, numberHistory.size())
-                .filter(i -> number == numberHistory.get(i))
-                .toArray();
-        int maxI = indexes.length - 1;
-        return Math.abs(indexes[maxI] - indexes[maxI - 1]);
+    public void sayNumber(final int number) {
+        final boolean firstUse = !numberLastTurnMap.containsKey(number);
+        if (!firstUse) {
+            final int previousLastTurn = numberLastTurnMap.get(number);
+            numberAgeMap.put(number, turn - previousLastTurn);
+        }
+        numberLastTurnMap.put(number, turn);
+        lastNumber = number;
     }
 
     public int getLastNumber() {
-        return numberHistory.get(numberHistory.size() - 1);
-    }
-
-    public int countOccurrences(final int number) {
-        return Collections.frequency(numberHistory, number);
+        return lastNumber;
     }
 }
